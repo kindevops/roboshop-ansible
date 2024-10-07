@@ -1,0 +1,74 @@
+-  name: user yaml service
+   hosts: user
+   enabled: yes
+   tasks:
+   -  name: disable and enable nodejs
+      ansible.builtin.shell: dnf module disable nodejs -y ; dnf module enable nodejs:20 -y
+
+   -  name: install nodejs
+      ansible.builtin.dnf:
+          name: nodejs
+          state: present
+        
+   -  name: create roboshop user
+      ansible.builtin.user:
+          name: roboshop
+
+   -  name: delete app content
+      ansible.builtin.file:
+          path: /app
+          state: absent
+
+   -  name:  create app content
+      ansible.builtin.file:
+          path: /app
+          state: directory
+
+   -  name: download the content
+      ansible.builtin.get_url:
+          url: https://roboshop-builds.s3.amazonaws.com/user.zip
+          dest: /tmp
+
+   -  name: extract data
+      ansible.builtin.unarchived:
+          src: /tmp/user.zip
+          dest: /app
+          remote_src: yes
+
+   -  name: npm install
+      ansible.builtin.command:  npm install
+
+   -  name: copy user service
+      ansible.builtin.copy: 
+          src: user.service
+          dest: /etc/systemd/system/user.service
+
+   -  name: damemon reload 
+      ansible.builtin.systemd_service:
+          daemon_reload: true
+
+   -  name: copy mongodb
+      ansible.builtin.copy:
+          src: mongodb.repo
+          dest: /etc/yum.repos.d/mongodb.repo
+
+   -  name: install mongodb-client
+      ansible.builtin.package:
+          name: mongodb-mongosh
+          state: present
+
+   - name: get the categories count
+     ansible.builtin.command:  mongosh --host mongodb.kintravel.shop --quiet --eval 'db = db.getSiblingDB("user"); db.products.count()'
+     register: product_count
+
+
+   - name: load catalogue data
+     ansible.builtin.command: mongosh --host mongodb.kintravel.shop < /app/schema/user.js
+     when: product_count.stdout == "0" # keep double quotes
+
+
+   -  name: start and enable
+      ansible.builtin.service:
+         name: mongod
+         state: started
+         enabled: yes

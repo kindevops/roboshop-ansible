@@ -1,0 +1,82 @@
+- name: catalogue module
+  hosts: catalogue
+  become: yes
+  tasks:
+  -  name: disable and enable enable catalogue
+     ansible.builtin.shell: dnf module disable nodejs -y ; dnf module enable nodejs:20 -y
+
+  -  name: install nodejs
+     ansible.builtin.dnf:
+         name: nodejs
+         state: present
+
+  -   name: create roboshop user
+      ansible.builtin.user:
+         name: roboshop
+
+  -   name: remove directory
+      ansible.builtin.file:
+         path: /app
+         state: absent
+
+  -   name: create directory
+      ansible.builtin.file:
+         path: /app
+         state: directory
+
+  -  name:   download catalogue application  
+     ansible.builtin.get_url:
+         url: https://roboshop-builds.s3.amazonaws.com/catalogue.zip
+         dest: /tmp
+
+  -  name: extract catalogue
+     ansible.builtin.unarchive:
+         src: /tmp/catlogue.zip
+         dest: /app
+         remote_src: yes
+
+  -  name: install npm
+     ansible.builtin.command: npm install
+     args:
+         chdir: /app
+
+  -  name: create service
+     ansible.builtin.copy:
+         src: catalogue.service
+         dest: /etc/systemd/system/catalogue.service
+
+  -  name: restart daemon service
+     ansible.builtin.systemd_service:
+         daemon_reload: true
+    
+  -  name: copy mongo db
+     ansible.builtin.copy:
+         src: mongodb.repo
+         dest: /etc/yum.respos.d/mongodb.repo
+
+  -  name: Install mongodb client
+     ansible.builtin.package:
+         name: mongodb-mongosh
+         state: present
+
+  - name: get the categories count
+    ansible.builtin.command:  mongosh --host mongodb.kintravel.shop --quiet --eval 'db = db.getSiblingDB("catalogue"); db.products.count()'
+    register: product_count
+
+
+  - name: load catalogue data
+    ansible.builtin.command: mongosh --host mongodb.kintravel.shop < /app/schema/catalogue.js
+    when: product_count.stdout == "0" # keep double quotes
+
+
+  -  name: start and enable
+     ansible.builtin.service:
+         name: mongod
+         state: started
+         enabled: yes
+
+  
+         
+         
+
+     
