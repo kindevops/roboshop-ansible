@@ -1,6 +1,6 @@
 -  name: cart module
    hosts: cart
-   enabled: yes
+   become: yes
    tasks:
    -  name: disable and enable cart module
       ansible.builtin.shell: dnf module disable nodejs -y ;  dnf module enable nodejs:20 -y
