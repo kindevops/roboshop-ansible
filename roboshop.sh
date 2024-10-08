@@ -3,7 +3,7 @@
 AMI=ami-09c813fb71547fc4f #this keeps on changing
 SG_ID=sg-023a93812b480a28d #replace with your SG ID
 #INSTANCES=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "web")
-INSTANCES=("mongodb")
+INSTANCES=("mongodb" "catalogue")
 ZONE_ID=Z03707362JEQ4STMRKY6Z # replace your zone ID
 DOMAIN_NAME="kintravel.shop"
  #if [ $i == "mongodb" ] || [ $i == "mysql" ] || [ $i == "shipping" ]
