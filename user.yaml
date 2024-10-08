@@ -1,6 +1,6 @@
 -  name: user yaml service
    hosts: user
-   enabled: yes
+   become: yes
    tasks:
    -  name: disable and enable nodejs
       ansible.builtin.shell: dnf module disable nodejs -y ; dnf module enable nodejs:20 -y
