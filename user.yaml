@@ -37,6 +37,8 @@
 
    -  name: npm install
       ansible.builtin.command:  npm install
+      args:
+        chdir: /app
 
    -  name: copy user service
       ansible.builtin.copy: 
@@ -70,5 +72,5 @@
    -  name: start and enable
       ansible.builtin.service:
          name: mongod
-         state: started
+         state: restarted
          enabled: yes
