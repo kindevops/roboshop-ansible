@@ -71,7 +71,7 @@
 
   -  name: start and enable
      ansible.builtin.service:
-         name: mongod
+         name: catalogue
          state: started
          enabled: yes
 
