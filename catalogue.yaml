@@ -63,9 +63,9 @@
     ansible.builtin.command:  mongosh --host mongodb.kintravel.shop --quiet --eval 'db = db.getSiblingDB("catalogue"); db.products.count()'
     register: product_count
 
-  - name: get product debug data
+  - name: print the count
     ansible.builtin.debug:
-        msg: "product count ${product_count.stdout} "
+        msg: "product count: {{product_count}}"
 
 
   - name: load catalogue data
