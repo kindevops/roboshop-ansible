@@ -27,7 +27,7 @@
    -  name: download cart data
       ansible.builtin.get_url:
           url: https://roboshop-builds.s3.amazonaws.com/cart.zip
-          path: /tmp
+          dest: /tmp
 
    -  name: extract data
       ansible.builtin.unarchive:
