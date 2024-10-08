@@ -30,7 +30,7 @@
           dest: /tmp
 
    -  name: extract data
-      ansible.builtin.unarchived:
+      ansible.builtin.unarchive:
           src: /tmp/user.zip
           dest: /app
           remote_src: yes
